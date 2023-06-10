@@ -1,0 +1,26 @@
+# Base image
+FROM ubuntu:latest
+
+# Update the system and install necessary packages
+RUN apt-get update && apt-get install -y apt-transport-https curl
+
+# Download and add the Kubernetes signing key
+RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+
+# Add the Kubernetes repository
+RUN echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+
+# Update the system and install Kubernetes components
+RUN apt-get update && apt-get install -y kubelet kubeadm kubectl
+
+# Set the Kubernetes version
+ARG KUBERNETES_VERSION=1.21.0
+
+# Install a specific version of kubectl
+RUN curl -LO "https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl" && \
+    chmod +x ./kubectl && \
+    mv ./kubectl /usr/local/bin/kubectl
+
+# Set the entry point
+ENTRYPOINT [ "bash" ]
+
